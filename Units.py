@@ -1,5 +1,5 @@
 import time
-import Database
+import DataConfig
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
@@ -16,7 +16,7 @@ def data_input (list,unit,connect,cursor):
     # cursor = connect.cursor()
 
     if len(list) == 12:
-        Database.dataUnits(connect,cursor,unit,list)
+        DataConfig.dataUnits(connect,cursor,unit,list)
         # sql = "insert into units_gather(date,rongzi_yue,rongzi_shizhibi,rongzi_mairue,rongzi_jiaoebi,rongzi_changhuange,rongquan_yuliang,rongquan_maichu,rongquan_changhuan,rongquan_yuliangbiliutongpan,rongzirongquanyue,yuechazhi,code) value ("+"'"+list[0]+"'"+ "," +"'"+list[1]+"'"+ "," +"'"+list[2]+"'"+ "," +"'"+list[3]+"'"+ "," +"'"+list[4]+"'"+ "," +"'"+list[5]+"'"+ "," +"'"+list[6]+"'"+ "," +"'"+list[7]+"'"+ "," +"'"+list[8]+"'"+ "," +"'"+list[9]+"'"+ "," +"'"+list[10]+"'"+ "," +"'"+list[11]+"'""," +"'"+unit+"'"+") "
         #
         # cursor.execute(sql)
@@ -94,13 +94,13 @@ def run (unit):
     html = driver.page_source
 
     # 数据库配置
-    connect,cursor = Database.connect()
-    Database.createTable(cursor, 'sqlUnits')
+    connect,cursor = DataConfig.connect()
+    DataConfig.createTable(cursor, 'sqlUnits')
 
     # 数据获取
     page_roll(driver,html,unit,connect,cursor)
 
-    Database.dataClose(connect)
+    DataConfig.dataClose(connect)
 
     driver.close()      # 浏览器还在
 

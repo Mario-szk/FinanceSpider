@@ -33,6 +33,9 @@ def createTable (cursor,sql):
   `id` int(255) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=MyISAM AUTO_INCREMENT=445 DEFAULT CHARSET=latin1;"""
+
+
+
     sqlModelGain = """ 
         CREATE TABLE `jrj_gather` (
   `date` varchar(10) CHARACTER SET utf8 NOT NULL,
@@ -76,4 +79,5 @@ def dataModelGain (connect,cursor,list):
 
 def dataClose (connect):
     connect.close
+    return
 
