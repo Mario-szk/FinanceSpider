@@ -1,10 +1,11 @@
+
 import pymysql
 
 # 配置的连接信息
 host = 'localhost'
 user = 'root'
 password = 'root'
-db = 'newtest'
+db = 'test'
 charset = 'utf8'
 
 
@@ -17,42 +18,42 @@ def connect ():
 
 def createTable (cursor,sql):
     sqlUnits = """CREATE TABLE `units_gather` (
-  `date` datetime NOT NULL,
-  `rongzi_yue` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_shizhibi` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_mairue` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_jiaoebi` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_changhuange` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_yuliang` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_maichu` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_changhuan` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_yuliangbiliutongpan` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzirongquanyue` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `yuechazhi` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `code` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
+  `code` varchar(100) DEFAULT NULL COMMENT '股票代码',
+  `date` date NOT NULL COMMENT '交易日期',
+  `rongzi_yue` int(100) DEFAULT NULL COMMENT '余额',
+  `rongzi_shizhibi` int(100) DEFAULT NULL COMMENT '占流通市值比（单位：%）',
+  `rongzi_mairue` int(100) DEFAULT NULL COMMENT '买入额',
+  `rongzi_jiaoebi` int(100) DEFAULT NULL COMMENT '占成交额比（单位：%）',
+  `rongzi_changhuange` int(100) DEFAULT NULL COMMENT '偿还额',
+  `rongquan_yuliang` int(100) DEFAULT NULL COMMENT '余量',
+  `rongquan_maichu` int(100) DEFAULT NULL COMMENT '卖出量',
+  `rongquan_changhuan` int(100) DEFAULT NULL COMMENT '偿还量',
+  `rongquan_yuliangbiliutongpan` int(100) DEFAULT NULL COMMENT '融券余量\r\n/流通盘',
+  `rongzirongquanyue` int(100) DEFAULT NULL COMMENT '融资融券\r\n余额',
+  `yuechazhi` int(100) DEFAULT NULL COMMENT '余额差值',
   `id` int(255) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=445 DEFAULT CHARSET=latin1;"""
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;"""
 
 
 
     sqlModelGain = """ 
         CREATE TABLE `jrj_gather` (
-  `date` varchar(10) CHARACTER SET utf8 NOT NULL,
-  `rongzi_yue` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_yuezengjian` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_shizhi` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_mairue` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_changhuange` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_yuliang` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_maichu` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_changhuan` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzirongquanyue` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `chazhi` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongzi_gegu` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
-  `rongquan_gegu` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
+  `date` date NOT NULL COMMENT '交易日期',
+  `rongzi_yue` int(100) DEFAULT NULL COMMENT '余额',
+  `rongzi_yuezengjian` int(100) DEFAULT NULL COMMENT '余额增减',
+  `rongzi_shizhi` int(100) DEFAULT NULL COMMENT '融资余额/流通市值（单位：%）',
+  `rongzi_mairue` int(100) DEFAULT NULL COMMENT '买入额',
+  `rongzi_changhuange` int(100) DEFAULT NULL COMMENT '偿还额',
+  `rongquan_yuliang` int(100) DEFAULT NULL COMMENT '余量',
+  `rongquan_maichu` int(100) DEFAULT NULL COMMENT '卖出量',
+  `rongquan_changhuan` int(100) DEFAULT NULL COMMENT '偿还量',
+  `rongzirongquanyue` int(100) DEFAULT NULL COMMENT '融资融券\r\n余额',
+  `chazhi` int(100) DEFAULT NULL COMMENT '余额差值',
+  `rongzi_gegu` int(100) DEFAULT NULL COMMENT '融资个股',
+  `rongquan_gegu` int(100) DEFAULT NULL COMMENT '融券个股',
   PRIMARY KEY (`date`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
     """
 
     if sql is 'sqlModelGain':
@@ -64,7 +65,7 @@ def createTable (cursor,sql):
 
 
 def dataUnits (connect,cursor,unit,list):
-    sql = "insert into units_gather(date,rongzi_yue,rongzi_shizhibi,rongzi_mairue,rongzi_jiaoebi,rongzi_changhuange,rongquan_yuliang,rongquan_maichu,rongquan_changhuan,rongquan_yuliangbiliutongpan,rongzirongquanyue,yuechazhi,code) value (" + "'" + list[0] + "'" + "," + "'" + list[1] + "'" + "," + "'" + list[2] + "'" + "," + "'" + list[3] + "'" + "," + "'" + list[4] + "'" + "," + "'" + list[5] + "'" + "," + "'" + list[6] + "'" + "," + "'" + list[7] + "'" + "," + "'" + list[8] + "'" + "," + "'" + list[9] + "'" + "," + "'" + list[10] + "'" + "," + "'" + list[11] + "'""," +"'"+unit+"'"+") "
+    sql = "insert into units_gather(code,date,rongzi_yue,rongzi_shizhibi,rongzi_mairue,rongzi_jiaoebi,rongzi_changhuange,rongquan_yuliang,rongquan_maichu,rongquan_changhuan,rongquan_yuliangbiliutongpan,rongzirongquanyue,yuechazhi) value ("+"'"+unit+"'" + "," + "'" + list[0] + "'" + "," + "'" + list[1] + "'" + "," + "'" + list[2] + "'" + "," + "'" + list[3] + "'" + "," + "'" + list[4] + "'" + "," + "'" + list[5] + "'" + "," + "'" + list[6] + "'" + "," + "'" + list[7] + "'" + "," + "'" + list[8] + "'" + "," + "'" + list[9] + "'" + "," + "'" + list[10] + "'" + "," + "'" + list[11] + "'"+ ") "
 
     cursor.execute(sql)
     connect.commit()

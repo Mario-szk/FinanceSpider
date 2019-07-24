@@ -1,13 +1,36 @@
-import threading
+
 import DataConfig
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import re
+import decimal
 
 
 def get_content (html,num):
+
     cont_list = BeautifulSoup(html, 'lxml').find_all('tr')[num]
-    cont_lists = [ item.text for item in cont_list ]
-    return cont_lists
+    cont_lists = [item.text for item in cont_list]
+
+    # 单位统一
+    wan = '万'
+    for i in range(13):
+        result = wan in cont_lists[i]
+        if result:
+            data = str(decimal.Decimal(re.findall('\-\d+\.\d+|\d+\.\d+|--', cont_lists[i])[0]) / 10000)
+            cont_lists[i] = data
+
+
+    #匹配数字
+    content = []
+    for i in range(13):
+        if i is 0:
+            content.append(cont_lists[i])
+        elif i>0 and i<=10:
+            content.append(re.findall('\d+\.\d+', cont_lists[i])[0])
+        else:
+            content.append(cont_lists[i])
+
+    return content
 
 
 def data_input (list,connect,cursor):
@@ -66,8 +89,25 @@ def modelGain ():
 
 def get_content_unit (html,num):
     cont_list = BeautifulSoup(html, 'lxml').find_all('tr')[num]
-    cont_lists = [ item.text for item in cont_list ]
-    return cont_lists
+    cont_lists = [item.text for item in cont_list]
+
+    # 单位统一
+    wan = '万'
+    for i in range(12):
+        result = wan in cont_lists[i]
+        if result:
+            data = str(decimal.Decimal(re.findall('\-\d+\.\d+|\d+\.\d+|--', cont_lists[i])[0]) / 10000)
+            cont_lists[i] = data
+
+    #匹配数字
+    content = []
+    for i in range(12):
+        if i is 0:
+            content.append(cont_lists[i])
+        else:
+            content.append(re.findall('\d+\.\d+', cont_lists[i])[0])
+
+    return content
 
 
 def data_input_unit (list,unit,connect,cursor):
@@ -130,9 +170,11 @@ def func():
     list = ['sh601318', 'sh600831', 'sz000063', 'sz002415']
     for i in list:
         run(i)
-    timer = threading.Timer(86400, func)
-    timer.start()
+    # timer = threading.Timer(86400, func)
+    # timer.start()
 
 #定时器,参数为(多少时间后执行，单位为秒，执行的方法)
-timer = threading.Timer(86400, func)
-timer.start()
+# timer = threading.Timer(86400, func)
+# timer.start()
+
+func()

@@ -1,26 +1,43 @@
+#coding=utf-8
+
 import time
 import DataConfig
 from selenium import webdriver
 from bs4 import BeautifulSoup
-
+import re
+import decimal
 
 
 def get_content (html,num):
     cont_list = BeautifulSoup(html, 'lxml').find_all('tr')[num]
     cont_lists = [ item.text for item in cont_list ]
-    return cont_lists
+
+    # 单位统一
+    wan = '万'
+    for j in range(12):
+        result = wan in cont_lists[j]
+        if result:
+            data = str(decimal.Decimal(re.findall('\-\d+\.\d+|\d+\.\d+|--', cont_lists[j])[0]) / 10000)
+            cont_lists[j] = data
+
+
+    #匹配数字
+    content = []
+    for i in range(12):
+        if i is 0:
+            content.append(cont_lists[i])
+        else:
+            content.append(re.findall('\-\d+\.\d+|\d+\.\d+|0', cont_lists[i])[0])
+            if content[-1] is '--':
+                content[-1] = '0'
+
+    return content
 
 
 def data_input (list,unit,connect,cursor):
-    # connect = pymysql.connect(host='localhost',user='root',password='root',db='test',charset='utf8')
-    # cursor = connect.cursor()
 
     if len(list) == 12:
         DataConfig.dataUnits(connect,cursor,unit,list)
-        # sql = "insert into units_gather(date,rongzi_yue,rongzi_shizhibi,rongzi_mairue,rongzi_jiaoebi,rongzi_changhuange,rongquan_yuliang,rongquan_maichu,rongquan_changhuan,rongquan_yuliangbiliutongpan,rongzirongquanyue,yuechazhi,code) value ("+"'"+list[0]+"'"+ "," +"'"+list[1]+"'"+ "," +"'"+list[2]+"'"+ "," +"'"+list[3]+"'"+ "," +"'"+list[4]+"'"+ "," +"'"+list[5]+"'"+ "," +"'"+list[6]+"'"+ "," +"'"+list[7]+"'"+ "," +"'"+list[8]+"'"+ "," +"'"+list[9]+"'"+ "," +"'"+list[10]+"'"+ "," +"'"+list[11]+"'""," +"'"+unit+"'"+") "
-        #
-        # cursor.execute(sql)
-        # connect.commit()
     else:
         return 'none'
 
@@ -84,7 +101,7 @@ def split (unit):
     return unit_split
 
 
-def run (unit):
+def run (unit,connect,cursor):
 
     url = 'http://stock.jrj.com.cn/share,'+split(unit)+',rzrq.shtml'
 
@@ -93,14 +110,14 @@ def run (unit):
 
     html = driver.page_source
 
-    # 数据库配置
-    connect,cursor = DataConfig.connect()
-    DataConfig.createTable(cursor, 'sqlUnits')
+    # # 数据库配置
+    # connect,cursor = DataConfig.connect()
+    # DataConfig.createTable(cursor, 'sqlUnits')
 
     # 数据获取
     page_roll(driver,html,unit,connect,cursor)
 
-    DataConfig.dataClose(connect)
+    # DataConfig.dataClose(connect)
 
     driver.close()      # 浏览器还在
 
